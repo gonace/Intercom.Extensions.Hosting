@@ -19,12 +19,12 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build Cronitor.Extensions.Hosting/Cronitor.Extensions.Hosting.csproj --no-restore --configuration Release
+      run: dotnet build Intercom.Extensions.Hosting/Intercom.Extensions.Hosting.csproj --no-restore --configuration Release
     - name: Publish
       uses: laget-se/publish-nuget@v2.7.2
       with:
         INCLUDE_SYMBOLS: true
         NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-        NUSPEC_FILE: Cronitor.Extensions.Hosting.nuspec
-        PROJECT_FILE_PATH: Cronitor.Extensions.Hosting/Cronitor.Extensions.Hosting.csproj
-        VERSION_STATIC: "1.3.${{github.run_number}}"
+        NUSPEC_FILE: Intercom.Extensions.Hosting.nuspec
+        PROJECT_FILE_PATH: Intercom.Extensions.Hosting/Intercom.Extensions.Hosting.csproj
+        VERSION_STATIC: "0.1.${{github.run_number}}-alpha"
