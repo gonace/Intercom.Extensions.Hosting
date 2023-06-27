@@ -1,59 +1,68 @@
 ﻿using Intercom.Constants;
 using Microsoft.Extensions.Hosting;
 using System;
+using Version = Intercom.Constants.Version;
 
 namespace Intercom.Extensions.Hosting
 {
     public static class HostBuilderExtensions
     {
-        public static IHostBuilder UseIntercom(this IHostBuilder builder, string baseUrl, string bearerToken)
+        public static IHostBuilder UseIntercom(this IHostBuilder builder, IntercomConfiguration configuration)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            ConfigureIntercom(baseUrl, bearerToken);
+            ConfigureIntercom(configuration);
 
             return builder;
         }
 
-        public static IHostBuilder UseIntercom(this IHostBuilder builder, string bearerToken)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-
-            ConfigureIntercom(Url.Production, bearerToken);
-
-            return builder;
-        }
-
-        public static IHostBuilder UseCronitor(this IHostBuilder builder, Func<HostBuilderContext, string> options)
+        public static IHostBuilder UseIntercom(this IHostBuilder builder, Func<HostBuilderContext, IntercomConfiguration> options)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
             builder.ConfigureServices((context, services) =>
             {
-                var apiKey = options(context);
-                ConfigureIntercom(apiKey);
+                var configuration = options(context);
+                ConfigureIntercom(configuration);
             });
 
             return builder;
         }
 
-        private static void ConfigureIntercom(string baseUrl, string bearerToken)
+        private static void ConfigureIntercom(IntercomConfiguration configuration)
         {
-            if (string.IsNullOrWhiteSpace(bearerToken)) throw new ArgumentNullException(nameof(bearerToken));
+            if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
-            Intercom.Configure(baseUrl, bearerToken);
+            Intercom.Configure(configuration.Url, configuration.BearerToken, configuration.Version);
         }
     }
 
-    public class IntercomOptions
+    public class IntercomConfiguration
     {
-        public string Url { get; set; }
         public string BearerToken { get; set; }
+        public Url Url { get; set; }
+        public Version Version { get; set; }
 
-        public IntercomOptions(string url, string bearerToken)
+        public IntercomConfiguration(string bearerToken, Url url, Version version)
         {
-            Url = url;
             BearerToken = bearerToken;
+            Url = url;
+            Version = version;
+        }
+
+        public IntercomConfiguration(string bearerToken, Url url)
+        {
+            BearerToken = bearerToken;
+            Url = url;
+            Version = Version.Latest;
+        }
+
+        public IntercomConfiguration(string bearerToken)
+        {
+            BearerToken = bearerToken;
+            Url = Url.Production;
+            Version = Version.Latest;
+
         }
     }
 }
