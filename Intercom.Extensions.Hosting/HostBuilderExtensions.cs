@@ -7,7 +7,15 @@ namespace Intercom.Extensions.Hosting
 {
     public static class HostBuilderExtensions
     {
-        public static IHostBuilder UseIntercom(this IHostBuilder builder, IntercomConfiguration configuration)
+        [Obsolete("This method has no more usages and will be removed in a future version, please use ConfigureCronitor(string apiKey) instead.")]
+        public static IHostBuilder UseIntercom(this IHostBuilder builder, IntercomConfiguration configuration) =>
+            builder.ConfigureIntercom(configuration);
+
+        [Obsolete("This method has no more usages and will be removed in a future version, please use ConfigureCronitor(string apiKey) instead.")]
+        public static IHostBuilder UseIntercom(this IHostBuilder builder, Func<HostBuilderContext, IntercomConfiguration> options) =>
+            builder.ConfigureIntercom(options);
+
+        public static IHostBuilder ConfigureIntercom(this IHostBuilder builder, IntercomConfiguration configuration)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
@@ -16,7 +24,7 @@ namespace Intercom.Extensions.Hosting
             return builder;
         }
 
-        public static IHostBuilder UseIntercom(this IHostBuilder builder, Func<HostBuilderContext, IntercomConfiguration> options)
+        public static IHostBuilder ConfigureIntercom(this IHostBuilder builder, Func<HostBuilderContext, IntercomConfiguration> options)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
