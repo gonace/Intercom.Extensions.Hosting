@@ -1,7 +1,10 @@
-name: Publish
+﻿name: Publish
 
 on:
   workflow_dispatch: {}
+
+env:
+  VERSION: "0.1"
 
 jobs:
   publish:
@@ -9,19 +12,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
+    - uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 6.0.x
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build Intercom.Extensions.Hosting/Intercom.Extensions.Hosting.csproj --no-restore --configuration Release
-    - name: Publish
-      uses: laget-se/publish-nuget@v2.7.2
-      with:
-        INCLUDE_SYMBOLS: true
-        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-        NUSPEC_FILE: Intercom.Extensions.Hosting.nuspec
-        PROJECT_FILE_PATH: Intercom.Extensions.Hosting/Intercom.Extensions.Hosting.csproj
-        VERSION_STATIC: "0.1.${{github.run_number}}-alpha"
+    - run: dotnet restore
+    - run: dotnet build --configuration Release Intercom.Extensions.Hosting/Intercom.Extensions.Hosting.csproj
+    - run: dotnet pack --configuration Release Intercom.Extensions.Hosting/Intercom.Extensions.Hosting.csproj --no-build -p:Version=$VERSION.${{github.run_number}}-alpha -p:PackageVersion=0.1.${{github.run_number}}-alpha -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg -p:NuspecFile=Intercom.Extensions.Hosting.nuspec
+    - run: dotnet nuget push Intercom.Extensions.Hosting/bin/Release/Intercom.Extensions.Hosting.$VERSION.${{github.run_number}}-alpha.nupkg --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
